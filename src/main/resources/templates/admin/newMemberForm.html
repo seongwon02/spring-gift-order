@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>새 멤버 등록</title>
+</head>
+<body>
+<h1>새 멤버 등록</h1>
+
+<form th:action="@{/admin/members}" method="post">
+  <label for="email">email:</label>
+  <input type="text" id="email" name="email" required><br><br>
+
+  <label for="password">password:</label>
+  <input type="text" id="password" name="password" required><br><br>
+
+  <button type="submit">멤버 추가</button>
+  <a th:href="@{/admin/members}">취소</a> </form>
+
+</body>
+</html>
