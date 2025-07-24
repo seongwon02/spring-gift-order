@@ -19,7 +19,6 @@ public class KakaoTokenResponseDto {
     @JsonProperty("refresh_token_expires_in")
     private Integer refreshTokenExpiresIn;
 
-    @JsonProperty("scope")
     private String scope;
 
     public KakaoTokenResponseDto(String tokenType,
