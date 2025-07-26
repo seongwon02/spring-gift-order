@@ -1,6 +1,6 @@
 package gift.exception;
 
-import gift.exception.kakao.KakaoOAuthExcetion;
+import gift.exception.kakao.KakaoException;
 import gift.exception.member.MemberException;
 import gift.exception.product.ProductException;
 import gift.exception.product.option.OptionException;
@@ -74,9 +74,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getHttpStatus()).body(errors);
     }
 
-    @ExceptionHandler(KakaoOAuthExcetion.class)
+    @ExceptionHandler(KakaoException.class)
     public ResponseEntity<Map<String, String>>
-    handlerValidationError(KakaoOAuthExcetion e) {
+    handlerValidationError(KakaoException e) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", e.getMessage());
 
