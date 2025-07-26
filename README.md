@@ -10,3 +10,4 @@
   - API 구현 목록
     - 토큰 받기: `GET /api/api/oauth`
   - 카카오 로그인 페이지: `http://localhost:8080/login`
+  - 카카오 로그인 테스트 코드 작성
