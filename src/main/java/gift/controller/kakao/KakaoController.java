@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 public class KakaoController {
@@ -16,13 +18,15 @@ public class KakaoController {
 
     @GetMapping("/login")
     public String loginPage(Model model) {
-        String location = "https://kauth.kakao.com/oauth/authorize";
-        String queryParams = "?client_id=" + kakaoRestApiKey
-                + "&redirect_uri=" + kakaoRedirectUri
-                + "&response_type=code"
-                + "&scope=talk_message";
+        String kakaoLoginUrl = UriComponentsBuilder
+                .fromUriString("https://kauth.kakao.com/oauth/authorize")
+                .queryParam("client_id", kakaoRestApiKey)
+                .queryParam("redirect_uri", kakaoRedirectUri)
+                .queryParam("response_type", "code")
+                .queryParam("scope", "talk_message")
+                .toUriString();
 
-        model.addAttribute("kakaoLoginUrl", location + queryParams);
+        model.addAttribute("kakaoLoginUrl", kakaoLoginUrl);
 
         return "kakao/login";
     }
