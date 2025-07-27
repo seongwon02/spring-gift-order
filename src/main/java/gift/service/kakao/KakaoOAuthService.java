@@ -2,12 +2,7 @@ package gift.service.kakao;
 
 import gift.config.KakaoClient;
 import gift.dto.kakao.KakaoTokenResponseDto;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.RestClient;
 
 @Service
 public class KakaoOAuthService {
