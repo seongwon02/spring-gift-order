@@ -23,7 +23,7 @@ public class KakaoController {
                 .queryParam("client_id", kakaoRestApiKey)
                 .queryParam("redirect_uri", kakaoRedirectUri)
                 .queryParam("response_type", "code")
-                .queryParam("scope", "talk_message")
+                .queryParam("scope", "talk_message account_email")
                 .toUriString();
 
         model.addAttribute("kakaoLoginUrl", kakaoLoginUrl);

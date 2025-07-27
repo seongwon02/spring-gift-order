@@ -1,16 +1,22 @@
 package gift.service.member;
 
+import gift.config.KakaoClient;
+import gift.dto.kakao.KakaoUserInfoResponseDto;
 import gift.dto.member.MemberRequestDto;
 import gift.dto.member.MemberResponseDto;
 import gift.dto.member.MemberRoleRequestDto;
 import gift.dto.member.TokenResponseDto;
 import gift.entity.Member;
+import gift.entity.OAuthAccount;
 import gift.entity.RoleType;
 import gift.exception.member.InvalidCredentialsException;
 import gift.exception.member.MemberAlreadyExistsException;
 import gift.exception.member.MemberNotFoundException;
 import gift.repository.MemberRepository;
+import gift.repository.OAuthAccountRepository;
 import gift.util.JwtTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,16 +24,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class MemberServiceImpl implements MemberService {
 
+    private static final Logger log = LoggerFactory.getLogger(MemberServiceImpl.class);
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final KakaoClient kakaoClient;
+    private final OAuthAccountRepository oAuthAccountRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
+    public MemberServiceImpl(MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider, KakaoClient kakaoClient, OAuthAccountRepository oAuthAccountRepository) {
         this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.kakaoClient = kakaoClient;
+        this.oAuthAccountRepository = oAuthAccountRepository;
     }
 
     @Transactional
@@ -50,7 +62,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public TokenResponseDto logInMember(MemberRequestDto dto) {
+    public TokenResponseDto loginMember(MemberRequestDto dto) {
         String email = dto.getEmail();
         String password = dto.getPassword();
 
@@ -68,6 +80,22 @@ public class MemberServiceImpl implements MemberService {
         String token = jwtTokenProvider.getAccessToken(member);
 
         return new TokenResponseDto(token);
+    }
+
+    @Transactional
+    @Override
+    public TokenResponseDto loginWithKakao(String kakaoToken) {
+        KakaoUserInfoResponseDto userInfo = kakaoClient.getUserInfo(kakaoToken);
+        String kakaoId = userInfo.id().toString();
+
+        Member member = oAuthAccountRepository.findByKakaoId(kakaoId)
+                .map(OAuthAccount::getMember)
+                .orElseGet(() -> registerWithOAuth(
+                        userInfo, kakaoId
+                ));
+
+        String accessToken = jwtTokenProvider.getAccessToken(member);
+        return new TokenResponseDto(accessToken);
     }
 
     @Override
@@ -164,5 +192,20 @@ public class MemberServiceImpl implements MemberService {
         }
 
         memberRepository.deleteById(id);
+    }
+
+    private Member registerWithOAuth(KakaoUserInfoResponseDto userInfo, String kakaoId) {
+
+        Member newMember = new Member(
+                userInfo.kakaoAccount().email(),
+                UUID.randomUUID().toString(),
+                RoleType.USER
+        );
+        memberRepository.save(newMember);
+
+        OAuthAccount oAuthAccount = new OAuthAccount(kakaoId, newMember);
+        oAuthAccountRepository.save(oAuthAccount);
+
+        return newMember;
     }
 }

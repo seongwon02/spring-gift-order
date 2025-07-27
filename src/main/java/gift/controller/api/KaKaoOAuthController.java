@@ -1,7 +1,9 @@
 package gift.controller.api;
 
 import gift.dto.kakao.KakaoTokenResponseDto;
+import gift.dto.member.TokenResponseDto;
 import gift.service.kakao.KakaoOAuthService;
+import gift.service.member.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,14 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class KaKaoOAuthController {
 
     private final KakaoOAuthService kakaoLoginService;
+    private final MemberService memberService;
 
-    public KaKaoOAuthController(KakaoOAuthService kakaoLoginService) {
+    public KaKaoOAuthController(KakaoOAuthService kakaoLoginService, MemberService memberService) {
         this.kakaoLoginService = kakaoLoginService;
+        this.memberService = memberService;
     }
 
     @GetMapping
-    public ResponseEntity<KakaoTokenResponseDto> login(@RequestParam("code") String code) {
-        KakaoTokenResponseDto accessToken = kakaoLoginService.getAccessToken(code);
-        return ResponseEntity.ok(accessToken);
+    public ResponseEntity<TokenResponseDto> login(@RequestParam("code") String code) {
+        KakaoTokenResponseDto kakaoToken = kakaoLoginService.getAccessToken(code);
+
+        TokenResponseDto tokenDto = memberService.loginWithKakao(kakaoToken.accessToken());
+        return ResponseEntity.ok(tokenDto);
     }
 }

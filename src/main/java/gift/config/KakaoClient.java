@@ -3,10 +3,12 @@ package gift.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.dto.kakao.KakaoTokenResponseDto;
+import gift.dto.kakao.KakaoUserInfoResponseDto;
 import gift.exception.kakao.KakaoException;
 import gift.exception.kakao.KakaoInvalidValueException;
 import gift.exception.kakao.KakaoOAuthExcetion;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -70,5 +72,13 @@ public class KakaoClient {
                 .body(body)
                 .retrieve()
                 .body(KakaoTokenResponseDto.class);
+    }
+
+    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+        return RestClient.create("https://kapi.kakao.com").get()
+                .uri("/v2/user/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .retrieve()
+                .body(KakaoUserInfoResponseDto.class);
     }
 }
