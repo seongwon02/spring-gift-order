@@ -37,7 +37,7 @@ public class MemberController {
     public ResponseEntity<TokenResponseDto> logIn (
             @Valid @RequestBody MemberRequestDto dto) {
 
-        return ResponseEntity.ok(memberService.logInMember(dto));
+        return ResponseEntity.ok(memberService.loginMember(dto));
     }
 
     @GetMapping

@@ -11,7 +11,8 @@ import java.util.Optional;
 public interface MemberService {
 
     TokenResponseDto registerMember(MemberRequestDto dto);
-    TokenResponseDto logInMember(MemberRequestDto dto);
+    TokenResponseDto loginMember(MemberRequestDto dto);
+    TokenResponseDto loginWithKakao(String kakaoToken);
 
     List<MemberResponseDto> findAllMembers();
     Optional<MemberResponseDto> findMemberById(Long id);

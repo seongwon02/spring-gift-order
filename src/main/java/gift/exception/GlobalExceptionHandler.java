@@ -1,5 +1,6 @@
 package gift.exception;
 
+import gift.exception.kakao.KakaoException;
 import gift.exception.member.MemberException;
 import gift.exception.product.ProductException;
 import gift.exception.product.option.OptionException;
@@ -67,6 +68,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OptionException.class)
     public ResponseEntity<Map<String, String>>
     handlerValidationError(OptionException e) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", e.getMessage());
+
+        return ResponseEntity.status(e.getHttpStatus()).body(errors);
+    }
+
+    @ExceptionHandler(KakaoException.class)
+    public ResponseEntity<Map<String, String>>
+    handlerValidationError(KakaoException e) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", e.getMessage());
 
