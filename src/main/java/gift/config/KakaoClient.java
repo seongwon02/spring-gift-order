@@ -22,7 +22,8 @@ import java.time.Duration;
 @Component
 public class KakaoClient {
 
-    private final RestClient restClient;
+    private final RestClient oAuthClient;
+    private final RestClient apiClient;
     private final String clientId;
     private final String redirectUri;
 
@@ -38,7 +39,7 @@ public class KakaoClient {
         requestFactory.setConnectTimeout(Duration.ofSeconds(5));
         requestFactory.setReadTimeout(Duration.ofSeconds(5));
 
-        this.restClient = RestClient.builder()
+        this.oAuthClient = RestClient.builder()
                 .baseUrl("https://kauth.kakao.com")
                 .requestFactory(requestFactory)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -56,6 +57,11 @@ public class KakaoClient {
                     }
                 })
                 .build();
+
+        this.apiClient = RestClient.builder()
+                .baseUrl("https://kapi.kakao.com")
+                .requestFactory(requestFactory)
+                .build();
     }
 
     public KakaoTokenResponseDto getToken(String code) {
@@ -66,7 +72,7 @@ public class KakaoClient {
         body.add("redirect_uri", redirectUri);
         body.add("code", code);
 
-        return restClient.post()
+        return oAuthClient.post()
                 .uri("/oauth/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(body)
@@ -75,7 +81,7 @@ public class KakaoClient {
     }
 
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-        return RestClient.create("https://kapi.kakao.com").get()
+        return apiClient.get()
                 .uri("/v2/user/me")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
