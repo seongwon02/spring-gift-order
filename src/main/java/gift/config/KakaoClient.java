@@ -6,6 +6,9 @@ import gift.dto.kakao.KakaoTokenRefreshResponseDto;
 import gift.dto.kakao.KakaoTokenResponseDto;
 import gift.dto.kakao.KakaoUserInfoResponseDto;
 import gift.entity.MemberKakaoToken;
+import gift.entity.Option;
+import gift.entity.Order;
+import gift.entity.Product;
 import gift.exception.kakao.KakaoException;
 import gift.exception.kakao.KakaoInvalidValueException;
 import gift.exception.kakao.KakaoOAuthException;
@@ -20,6 +23,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @Component
 public class KakaoClient {
@@ -103,4 +107,46 @@ public class KakaoClient {
                 .retrieve()
                 .body(KakaoUserInfoResponseDto.class);
     }
+
+    public void sendOrderToMe(String accessToken, Order order) {
+
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("template_object", getOrderTemplate(order));
+
+        apiClient.post()
+                .uri("/v2/api/talk/memo/default/send")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(body)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    private String getOrderTemplate (Order order) {
+        Option option = order.getOption();
+        Product product = option.getProduct();
+
+        String orderInfo = String.format(
+                "[주문 정보]\\n상품: %s\\n옵션: %s\\n수량: %d\\n메세지: %s",
+                product.getName(),
+                option.getName(),
+                order.getQuantity(),
+                Optional.ofNullable(order.getMessage()).orElse("")
+        );
+
+        return String.format("""
+        {
+          "object_type": "text",
+          "text": "%s",
+          "link": {
+            "web_url": "http://localhost:8080",
+            "mobile_web_url": "http://localhost:8080"
+          },
+          "button_title": "주문 확인"
+        }
+        """, orderInfo);
+    }
+
+
+
 }
