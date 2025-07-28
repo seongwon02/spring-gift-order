@@ -9,7 +9,7 @@ import java.time.Instant;
 public class MemberKakaoToken {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @MapsId
@@ -17,16 +17,16 @@ public class MemberKakaoToken {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "access_token")
     private String accessToken;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "refresh_token")
     private String refreshToken;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "access_token_expires_at")
     private Instant accessTokenExpiresAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "refresh_token_expires_at")
     private Instant refreshTokenExpiresAt;
 
     protected MemberKakaoToken() {}

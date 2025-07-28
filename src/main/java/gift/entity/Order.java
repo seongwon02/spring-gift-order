@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order{
 
     @Id
@@ -26,7 +26,7 @@ public class Order{
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "order_date_time")
     private LocalDateTime orderDateTime;
 
     protected Order() {}
