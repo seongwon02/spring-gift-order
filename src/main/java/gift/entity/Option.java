@@ -56,6 +56,10 @@ public class Option {
         return quantity;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
