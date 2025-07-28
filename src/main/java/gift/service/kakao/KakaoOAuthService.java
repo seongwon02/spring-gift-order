@@ -32,7 +32,7 @@ public class KakaoOAuthService {
 
     @Transactional
     public String getValidAccessToken(Member member) {
-        MemberKakaoToken memberKakaoToken = memberKakaoTokenRepository.findById(member.getId())
+        MemberKakaoToken memberKakaoToken = memberKakaoTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new KakaoTokenNotFoundException("해당 사용자의 카카오 토큰이 존재하지 않습니다."));
 
         if (!memberKakaoToken.isAccessTokenExpired())

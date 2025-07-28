@@ -9,7 +9,8 @@ import java.time.Instant;
 public class MemberKakaoToken {
 
     @Id
-    private Long memberId;
+    @GeneratedValue
+    private Long id;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
@@ -37,7 +38,6 @@ public class MemberKakaoToken {
                             Instant refreshTokenExpiresAt
     ) {
         this.member = member;
-        this.memberId = member.getId();
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.accessTokenExpiresAt = accessTokenExpiresAt;
@@ -64,10 +64,6 @@ public class MemberKakaoToken {
 
     public boolean isRefreshTokenExpired() {
         return refreshTokenExpiresAt.isBefore(Instant.now());
-    }
-
-    public Long getMemberId() {
-        return memberId;
     }
 
     public Member getMember() {
