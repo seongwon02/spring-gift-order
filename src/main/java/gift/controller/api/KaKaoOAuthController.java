@@ -26,7 +26,7 @@ public class KaKaoOAuthController {
     public ResponseEntity<TokenResponseDto> login(@RequestParam("code") String code) {
         KakaoTokenResponseDto kakaoToken = kakaoLoginService.getAccessToken(code);
 
-        TokenResponseDto tokenDto = memberService.loginWithKakao(kakaoToken.accessToken());
+        TokenResponseDto tokenDto = memberService.loginWithKakao(kakaoToken);
         return ResponseEntity.ok(tokenDto);
     }
 }
