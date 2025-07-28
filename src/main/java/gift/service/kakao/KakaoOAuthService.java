@@ -25,7 +25,7 @@ public class KakaoOAuthService {
         this.memberKakaoTokenRepository = memberKakaoTokenRepository;
     }
 
-    public KakaoTokenResponseDto getAccessToken(String code) {
+    public KakaoTokenResponseDto getInitialAccessToken(String code) {
 
         return kakaoClient.getToken(code);
     }
