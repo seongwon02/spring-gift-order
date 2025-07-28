@@ -63,7 +63,7 @@ create table member_kakao_token
     refresh_token               text not null,
     access_token_expires_at     timestamp(6) not null,
     refresh_token_expires_at    timestamp(6) not null,
-    primary key(id)
+    primary key(id),
     constraint fk_member foreign key (member_id) references member(id)
 );
 
@@ -76,8 +76,8 @@ create table orders
     message       text,
     order_date_time timestamp(6) not null,
     primary key (id),
-    constraint fk_option foreign key (option_id) references product_option,
-    constraint fk_member foreign key (member_id) references member
+    constraint fk_orders_option foreign key (option_id) references product_option(id),
+    constraint fk_orders_member foreign key (member_id) references member(id)
 );
 
 alter table if exists wish
