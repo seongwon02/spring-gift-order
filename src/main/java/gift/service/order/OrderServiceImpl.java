@@ -9,10 +9,12 @@ import gift.repository.OptionRepository;
 import gift.repository.OrderRepository;
 import gift.repository.WishRepository;
 import gift.service.kakao.KakaoOAuthService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Service
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
