@@ -2,11 +2,13 @@ package gift.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gift.dto.kakao.KakaoTokenRefreshResponseDto;
 import gift.dto.kakao.KakaoTokenResponseDto;
 import gift.dto.kakao.KakaoUserInfoResponseDto;
+import gift.entity.MemberKakaoToken;
 import gift.exception.kakao.KakaoException;
 import gift.exception.kakao.KakaoInvalidValueException;
-import gift.exception.kakao.KakaoOAuthExcetion;
+import gift.exception.kakao.KakaoOAuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -51,7 +53,7 @@ public class KakaoClient {
                         case 400:
                             throw new KakaoInvalidValueException("잘못된 요청입니다: " + errorCode);
                         case 401:
-                            throw new KakaoOAuthExcetion("인증에 실패했습니다: " + errorCode);
+                            throw new KakaoOAuthException("인증에 실패했습니다: " + errorCode);
                         default:
                             throw new KakaoException("처리되지 않은 클라이언트 오류입니다: " + errorCode, status);
                     }
@@ -78,6 +80,20 @@ public class KakaoClient {
                 .body(body)
                 .retrieve()
                 .body(KakaoTokenResponseDto.class);
+    }
+
+    public KakaoTokenRefreshResponseDto reissueToken(MemberKakaoToken memberKakaoToken) {
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("grant_type", "refresh_token");
+        body.add("client_id", clientId);
+        body.add("refresh_token", memberKakaoToken.getRefreshToken());
+
+        return oAuthClient.post()
+                .uri("/oauth/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(body)
+                .retrieve()
+                .body(KakaoTokenRefreshResponseDto.class);
     }
 
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
