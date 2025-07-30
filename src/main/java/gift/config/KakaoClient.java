@@ -1,10 +1,13 @@
 package gift.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.dto.kakao.KakaoTokenRefreshResponseDto;
 import gift.dto.kakao.KakaoTokenResponseDto;
 import gift.dto.kakao.KakaoUserInfoResponseDto;
+import gift.dto.kakao.template.Link;
+import gift.dto.kakao.template.MessageTemplate;
 import gift.entity.MemberKakaoToken;
 import gift.entity.Option;
 import gift.entity.Order;
@@ -110,8 +113,19 @@ public class KakaoClient {
 
     public void sendOrderToMe(String accessToken, Order order) {
 
+        ObjectMapper objectMapper = new ObjectMapper();
         var body = new LinkedMultiValueMap<String, String>();
-        body.add("template_object", getOrderTemplate(order));
+
+        MessageTemplate template = getOrderTemplate(order);
+        String templateJson;
+
+        try {
+            templateJson = objectMapper.writeValueAsString(template);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("카카오 메세지 JSON 변환 실패");
+        }
+
+        body.add("template_object", templateJson);
 
         apiClient.post()
                 .uri("/v2/api/talk/memo/default/send")
@@ -122,31 +136,21 @@ public class KakaoClient {
                 .toBodilessEntity();
     }
 
-    private String getOrderTemplate (Order order) {
+    private MessageTemplate getOrderTemplate (Order order) {
         Option option = order.getOption();
         Product product = option.getProduct();
 
         String orderInfo = String.format(
-                "[주문 정보]\\n상품: %s\\n옵션: %s\\n수량: %d\\n메세지: %s",
+                "[주문 정보]\n상품: %s\n옵션: %s\n수량: %d\n메세지: %s",
                 product.getName(),
                 option.getName(),
                 order.getQuantity(),
                 Optional.ofNullable(order.getMessage()).orElse("")
         );
 
-        return String.format("""
-        {
-          "object_type": "text",
-          "text": "%s",
-          "link": {
-            "web_url": "http://localhost:8080",
-            "mobile_web_url": "http://localhost:8080"
-          },
-          "button_title": "주문 확인"
-        }
-        """, orderInfo);
+        Link link = new Link("http://localhost:8080", "http://localhost:8080");
+
+        return new MessageTemplate(orderInfo, link, "주문 확인");
     }
-
-
 
 }
