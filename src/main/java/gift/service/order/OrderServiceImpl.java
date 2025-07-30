@@ -41,8 +41,9 @@ public class OrderServiceImpl implements OrderService{
         option.substract(dto.quantity());
 
         Product product = option.getProduct();
-        if (wishRepository.existsByMemberIdAndProductId(member.getId(), product.getId()))
+        if (wishRepository.existsByMemberIdAndProductId(member.getId(), product.getId())) {
             wishRepository.deleteByMemberIdAndProductId(member.getId(), product.getId());
+        }
 
         Order order = new Order(
                 option,

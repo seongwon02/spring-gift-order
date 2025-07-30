@@ -25,10 +25,10 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-            @Valid @RequestBody OrderRequestDto dto,
+            @Valid @RequestBody OrderRequestDto order,
             @CurrentMember Member member
     ) {
-        OrderResponseDto result = orderService.createOrder(dto, member);
+        OrderResponseDto result = orderService.createOrder(order, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }
