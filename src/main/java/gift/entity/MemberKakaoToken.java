@@ -1,8 +1,10 @@
 package gift.entity;
 
+import gift.dto.kakao.KakaoTokenRefreshResponseDto;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Entity
 @Table(name = "member_kakao_token")
@@ -43,17 +45,16 @@ public class MemberKakaoToken {
         this.refreshTokenExpiresAt = refreshTokenExpiresAt;
     }
 
-    public void updateToken(String newAccessToken,
-                            String newRefreshToken,
-                            Instant newAccessExpiresAt,
-                            Instant newRefreshExpiresAt
-    ){
-        this.accessToken = newAccessToken;
-        this.accessTokenExpiresAt = newAccessExpiresAt;
+    public void updateToken(KakaoTokenRefreshResponseDto response){
+        Instant now = Instant.now();
 
-        if (newRefreshExpiresAt != null) {
-            this.refreshToken = newRefreshToken;
-            this.refreshTokenExpiresAt = newRefreshExpiresAt;
+        this.accessToken = response.accessToken();
+        this.accessTokenExpiresAt = now.plusSeconds(response.expiresIn());
+
+        if (Optional.ofNullable(response.refreshToken()).isPresent() &&
+            Optional.ofNullable(response.refreshTokenExpiresIn()).isPresent()) {
+            this.refreshToken = response.refreshToken();
+            this.accessTokenExpiresAt = now.plusSeconds(response.refreshTokenExpiresIn());
         }
     }
 

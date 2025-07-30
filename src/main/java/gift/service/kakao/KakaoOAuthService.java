@@ -43,22 +43,7 @@ public class KakaoOAuthService {
 
         KakaoTokenRefreshResponseDto response = kakaoClient.reissueToken(memberKakaoToken);
 
-        Instant now = Instant.now();
-        Instant newAccessTokenExpiresAt = now.plusSeconds(response.expiresIn());
-
-        String newRefreshToken = Optional.ofNullable(response.refreshToken())
-                .orElse(memberKakaoToken.getRefreshToken());
-
-        Instant newRefreshTokenExpiresAt = Optional.ofNullable(response.refreshTokenExpiresIn())
-                        .map(now::plusSeconds)
-                        .orElse(memberKakaoToken.getRefreshTokenExpiresAt());
-
-        memberKakaoToken.updateToken(
-                response.accessToken(),
-                newRefreshToken,
-                newAccessTokenExpiresAt,
-                newRefreshTokenExpiresAt
-                );
+        memberKakaoToken.updateToken(response);
 
         return response.accessToken();
     }
