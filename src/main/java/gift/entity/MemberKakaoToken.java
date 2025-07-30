@@ -9,12 +9,11 @@ import java.time.Instant;
 public class MemberKakaoToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "id")
     private Member member;
 
     @Column(nullable = false, name = "access_token")
