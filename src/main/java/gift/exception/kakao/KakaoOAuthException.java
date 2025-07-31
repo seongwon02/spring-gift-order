@@ -2,10 +2,10 @@ package gift.exception.kakao;
 
 import org.springframework.http.HttpStatus;
 
-public class KakaoOAuthExcetion extends KakaoException {
+public class KakaoOAuthException extends KakaoException {
 
 
-    public KakaoOAuthExcetion(String message) {
+    public KakaoOAuthException(String message) {
         super(message, HttpStatus.UNAUTHORIZED);
     }
 

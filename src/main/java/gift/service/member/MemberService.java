@@ -1,5 +1,6 @@
 package gift.service.member;
 
+import gift.dto.kakao.KakaoTokenResponseDto;
 import gift.dto.member.MemberRequestDto;
 import gift.dto.member.MemberResponseDto;
 import gift.dto.member.MemberRoleRequestDto;
@@ -12,7 +13,7 @@ public interface MemberService {
 
     TokenResponseDto registerMember(MemberRequestDto dto);
     TokenResponseDto loginMember(MemberRequestDto dto);
-    TokenResponseDto loginWithKakao(String kakaoToken);
+    TokenResponseDto loginWithKakao(KakaoTokenResponseDto kakaoToken);
 
     List<MemberResponseDto> findAllMembers();
     Optional<MemberResponseDto> findMemberById(Long id);

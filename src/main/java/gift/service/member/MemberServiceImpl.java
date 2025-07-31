@@ -1,17 +1,20 @@
 package gift.service.member;
 
 import gift.config.KakaoClient;
+import gift.dto.kakao.KakaoTokenResponseDto;
 import gift.dto.kakao.KakaoUserInfoResponseDto;
 import gift.dto.member.MemberRequestDto;
 import gift.dto.member.MemberResponseDto;
 import gift.dto.member.MemberRoleRequestDto;
 import gift.dto.member.TokenResponseDto;
 import gift.entity.Member;
+import gift.entity.MemberKakaoToken;
 import gift.entity.OAuthAccount;
 import gift.entity.RoleType;
 import gift.exception.member.InvalidCredentialsException;
 import gift.exception.member.MemberAlreadyExistsException;
 import gift.exception.member.MemberNotFoundException;
+import gift.repository.MemberKakaoTokenRepository;
 import gift.repository.MemberRepository;
 import gift.repository.OAuthAccountRepository;
 import gift.util.JwtTokenProvider;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,12 +38,18 @@ public class MemberServiceImpl implements MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final KakaoClient kakaoClient;
     private final OAuthAccountRepository oAuthAccountRepository;
+    private final MemberKakaoTokenRepository memberKakaoTokenRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider, KakaoClient kakaoClient, OAuthAccountRepository oAuthAccountRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository,
+                             JwtTokenProvider jwtTokenProvider,
+                             KakaoClient kakaoClient,
+                             OAuthAccountRepository oAuthAccountRepository,
+                             MemberKakaoTokenRepository memberKakaoTokenRepository) {
         this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.kakaoClient = kakaoClient;
         this.oAuthAccountRepository = oAuthAccountRepository;
+        this.memberKakaoTokenRepository = memberKakaoTokenRepository;
     }
 
     @Transactional
@@ -84,8 +94,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public TokenResponseDto loginWithKakao(String kakaoToken) {
-        KakaoUserInfoResponseDto userInfo = kakaoClient.getUserInfo(kakaoToken);
+    public TokenResponseDto loginWithKakao(KakaoTokenResponseDto kakaoToken) {
+        KakaoUserInfoResponseDto userInfo = kakaoClient.getUserInfo(kakaoToken.accessToken());
         String kakaoId = userInfo.id().toString();
 
         Member member = oAuthAccountRepository.findByKakaoId(kakaoId)
@@ -93,6 +103,19 @@ public class MemberServiceImpl implements MemberService {
                 .orElseGet(() -> registerWithOAuth(
                         userInfo, kakaoId
                 ));
+
+        MemberKakaoToken memberKakaoToken = memberKakaoTokenRepository.findById(member.getId())
+                .orElseGet(() -> new MemberKakaoToken(member, null, null, null, null));
+
+        Instant now = Instant.now();
+        memberKakaoToken.updateToken(
+                kakaoToken.accessToken(),
+                kakaoToken.refreshToken(),
+                now.plusSeconds(kakaoToken.expiresIn()),
+                now.plusSeconds(kakaoToken.refreshTokenExpiresIn())
+        );
+
+        memberKakaoTokenRepository.save(memberKakaoToken);
 
         String accessToken = jwtTokenProvider.getAccessToken(member);
         return new TokenResponseDto(accessToken);
