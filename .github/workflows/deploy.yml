@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew build
         env:
           # GitHub Secrets에 등록된 값을 환경변수로 주입합니다.
-          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_API_ID }}
           KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
 
       # 5. 빌드된 JAR 파일을 EC2 서버로 전송 (CD)
