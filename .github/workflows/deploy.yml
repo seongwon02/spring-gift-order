@@ -48,7 +48,9 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          source: "./build/libs/*.jar" # 빌드된 모든 .jar 파일을
+          source: |
+            ./build/libs/*.jar
+            ./deploy.sh
           target: "/home/ubuntu"       # 서버의 /home/ubuntu 폴더로 보냅니다.
 
       # 6. EC2 서버에서 배포 스크립트 실행
