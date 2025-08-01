@@ -60,5 +60,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
+            export KAKAO_ADMIN_KEY=${{ secrets.KAKAO_ADMIN_KEY }}
+            export KAKAO_REDIRECT_URI="http://${{ secrets.EC2_HOST }}:8080/api/oauth"
+            
             chmod +x /home/ubuntu/deploy.sh
             /home/ubuntu/deploy.sh
