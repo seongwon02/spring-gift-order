@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>멤버 수정</title>
+</head>
+<body>
+<h1>멤버 수정</h1>
+
+<form th:action="@{/admin/members/{id}(id=${member.id})}" method="post">
+  <input type="hidden" name="_method" value="put" />
+
+  <select name="role" id="role">
+    <option value="ADMIN" th:selected="${member.role} == 'ADMIN'">ADMIN</option>
+    <option value="USER" th:selected="${member.role} == 'USER'">USER</option>
+  </select>
+
+  <br><br>
+
+  <button type="submit">멤버 수정 완료</button>
+  <a th:href="@{/admin/members}">취소 및 목록으로</a>
+</form>
+
+</body>
+</html>
